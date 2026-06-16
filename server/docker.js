@@ -13,7 +13,16 @@ const { applyContainerRuntimeSpec } = require('./dockerSpec');
 const { validateVolumePaths, applyVolumesToHostConfig, bindHostPaths } = require('./volumes');
 const { applyNetworksToCreateOpts } = require('./networks');
 
-const docker = new Docker(process.env.DOCKER_HOST ? { socketPath: process.env.DOCKER_HOST } : {});
+function resolveDockerSocketPath() {
+  const raw = (process.env.DOCKER_HOST || '').trim();
+  if (!raw) return undefined;
+  if (raw.startsWith('unix://')) return raw.slice('unix://'.length);
+  if (raw.includes('://')) return undefined;
+  return raw;
+}
+
+const dockerSocketPath = resolveDockerSocketPath();
+const docker = dockerSocketPath ? new Docker({ socketPath: dockerSocketPath }) : new Docker();
 const DEPLOY_BASE_PATH = (process.env.DEPLOY_BASE_PATH || '/opt/deploy-data').replace(/\/+$/, '');
 const DEPLOY_BASE_PATH_RESOLVED = path.resolve(DEPLOY_BASE_PATH);
 /** Managed container label: app controls only containers with this label. Set MANAGED_LABEL / MANAGED_LABEL_VALUE per instance on shared hosts. */
