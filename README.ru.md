@@ -100,7 +100,7 @@ npm run test:ui
 
 ## Образы
 
-Тег `v*` публикует образ в **GHCR** (всегда) и **Docker Hub** (если заданы секреты). GHCR настраивать не нужно. Docker Hub: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` — без них job Docker Hub пропускается, workflow остаётся зелёным.
+Тег `v*` публикует образ в **GHCR** (всегда) и **Docker Hub** (опционально). GHCR настраивать не нужно. Для Docker Hub — секреты `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`; без них job Docker Hub не блокирует GHCR.
 
 ---
 

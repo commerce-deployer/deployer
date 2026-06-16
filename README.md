@@ -110,9 +110,9 @@ Full run: `npm run test:all`.
 
 ## Container images
 
-Tag `v*` triggers CI publish to **GHCR** (always) and **Docker Hub** (when secrets are set) — see [.github/workflows/publish-image.yml](.github/workflows/publish-image.yml).
+Tag `v*` triggers CI publish to **GHCR** (always) and **Docker Hub** (optional) — see [.github/workflows/publish-image.yml](.github/workflows/publish-image.yml).
 
-GHCR needs no extra setup. For Docker Hub add repository secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`. Without them the Docker Hub job is skipped (workflow still succeeds).
+GHCR needs no extra setup. For Docker Hub add secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`; until then the Docker Hub job is skipped without blocking GHCR.
 
 ---
 
