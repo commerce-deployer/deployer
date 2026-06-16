@@ -1,0 +1,30 @@
+# Secrets and local env
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Logs and OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Test artifacts (Playwright, manual QA)
+test-artifacts-e2e/
+test-artifacts-*/
+test-artifacts-ui-check.png
+templates/qa-manual-tpl-*.json
+templates-default/qa-manual-tpl-*.json
+
+# Coverage
+coverage/
+.nyc_output/
+
+# IDE (local only)
+.vscode/
+.idea/
+.cursorignore
+.cursor/

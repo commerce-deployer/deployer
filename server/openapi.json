@@ -1,0 +1,368 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Deployer API",
+    "description": "REST API for deploying containers from templates. Async: POST deploy/lifecycle → 202 + operation, poll GET /api/operations/:id. Deploy: containerName + params.",
+    "version": "1.2.0"
+  },
+  "servers": [{ "url": "/", "description": "Current host" }],
+  "components": {
+    "securitySchemes": {
+      "session": { "type": "apiKey", "in": "cookie", "name": "s" },
+      "apiKey": { "type": "apiKey", "in": "header", "name": "X-API-Key" }
+    },
+    "schemas": {
+      "ContainerRef": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "state": { "type": "string" }
+        }
+      },
+      "DeployResult": {
+        "type": "object",
+        "properties": {
+          "container": { "$ref": "#/components/schemas/ContainerRef" },
+          "params": { "type": "object", "additionalProperties": true, "description": "Resolved params after fillDefaults" }
+        }
+      },
+      "DeleteResult": {
+        "type": "object",
+        "properties": {
+          "removed": { "type": "boolean" },
+          "dataRemoved": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "OperationConflict": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "error": { "type": "string", "example": "operation_in_progress" },
+          "existingOperationId": { "type": "string" }
+        }
+      },
+      "DeployerBusy": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "error": { "type": "string", "example": "deployer_busy" },
+          "retryAfterSec": { "type": "integer" }
+        }
+      },
+      "DeployRequest": {
+        "type": "object",
+        "required": ["templateId", "containerName", "params"],
+        "properties": {
+          "templateId": { "type": "string", "example": "docker-demo-free" },
+          "containerName": {
+            "type": "string",
+            "description": "Docker container name. Set at deploy time, not in template JSON."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Template form fields (HOST_PORT, DOMAIN, …). Excludes container name."
+          }
+        }
+      },
+      "TemplatePort": {
+        "type": "object",
+        "properties": {
+          "containerPort": { "type": "integer" },
+          "hostPort": { "type": "string", "description": "Number or {{KEY}}" },
+          "protocol": { "type": "string", "enum": ["tcp", "udp"] }
+        }
+      },
+      "TemplateNetwork": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "aliases": { "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }] },
+              "ipv4Address": { "type": "string" }
+            }
+          }
+        ]
+      },
+      "Template": {
+        "type": "object",
+        "required": ["id", "image"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "image": { "type": "string" },
+          "pullPolicy": { "type": "string", "enum": ["always", "ifNotPresent"] },
+          "restartPolicy": { "type": "string" },
+          "restartMaxRetries": { "oneOf": [{ "type": "integer" }, { "type": "string" }] },
+          "platform": { "type": "string" },
+          "waitHealthy": { "type": "boolean" },
+          "waitHealthyTimeoutSec": { "oneOf": [{ "type": "integer" }, { "type": "string" }] },
+          "containerName": { "type": "string" },
+          "user": { "type": "string" },
+          "fields": { "type": "array", "items": { "type": "object" } },
+          "env": { "type": "array" },
+          "volumes": { "type": "array" },
+          "labels": { "type": "array" },
+          "networks": { "type": "array", "items": { "$ref": "#/components/schemas/TemplateNetwork" } },
+          "ports": { "type": "array", "items": { "$ref": "#/components/schemas/TemplatePort" } },
+          "entrypoint": { "type": "array", "items": { "type": "string" } },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "limits": { "type": "object" },
+          "dockerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "Operation": {
+        "type": "object",
+        "properties": {
+          "operationId": { "type": "string" },
+          "kind": { "type": "string", "enum": ["deploy", "delete", "start", "stop", "restart"] },
+          "slotKey": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued", "running", "succeeded", "failed"] },
+          "phase": { "type": "string" },
+          "message": { "type": "string" },
+          "result": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/DeployResult" },
+              { "$ref": "#/components/schemas/DeleteResult" },
+              { "type": "object" }
+            ],
+            "nullable": true
+          },
+          "error": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "finishedAt": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
+      "AcceptedOperation": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "operation": { "$ref": "#/components/schemas/Operation" }
+        }
+      }
+    }
+  },
+  "security": [{ "session": [] }, { "apiKey": [] }],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "summary": "Login",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["username", "password"], "properties": { "username": { "type": "string" }, "password": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "OK, session established" }, "401": { "description": "Invalid credentials" } },
+        "security": []
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Logout",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "summary": "Current user",
+        "responses": { "200": { "description": "user" }, "401": { "description": "Not authenticated" } }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": { "200": { "description": "OK" } },
+        "security": []
+      }
+    },
+    "/api/templates": {
+      "get": {
+        "summary": "List templates",
+        "responses": { "200": { "description": "Array of templates" } }
+      },
+      "post": {
+        "summary": "Create or update template",
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Template" } } } },
+        "responses": { "200": { "description": "Saved template" }, "400": { "description": "Validation error" } }
+      }
+    },
+    "/api/templates/{id}": {
+      "get": {
+        "summary": "Get template by ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Template" }, "404": { "description": "Not found" } }
+      },
+      "delete": {
+        "summary": "Delete template",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" }, "400": { "description": "Error" } }
+      }
+    },
+    "/api/deploy": {
+      "post": {
+        "summary": "Deploy container from template (async)",
+        "description": "202 + operation. containerName = Docker name; params = template fields.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DeployRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": { "description": "Operation accepted", "headers": { "Location": { "schema": { "type": "string" } }, "Retry-After": { "schema": { "type": "integer" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AcceptedOperation" } } } },
+          "200": { "description": "Sync mode (DEPLOYER_SYNC_LEGACY=1): container in body", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" }, "container": { "$ref": "#/components/schemas/ContainerRef" }, "params": { "type": "object" } } } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Not authenticated" },
+          "404": { "description": "Template not found" },
+          "409": { "description": "operation_in_progress", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OperationConflict" } } } },
+          "429": { "description": "Rate limit" },
+          "503": { "description": "deployer_busy", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeployerBusy" } } } },
+          "500": { "description": "Error Docker" }
+        }
+      }
+    },
+    "/api/operations/{id}": {
+      "get": {
+        "summary": "Async operation status",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "operation + Retry-After: 2", "headers": { "Retry-After": { "schema": { "type": "integer" } } }, "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" }, "operation": { "$ref": "#/components/schemas/Operation" } } } } } },
+          "404": { "description": "operation_not_found (e.g. after Deployer restart)" },
+          "429": { "description": "Rate limit poll" }
+        }
+      }
+    },
+    "/api/containers": {
+      "get": {
+        "summary": "List containers (pagination + deploy limit)",
+        "parameters": [
+          { "name": "all", "in": "query", "schema": { "type": "string" }, "description": "true — include stopped" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" }, "description": "Page size (default 20, max 100)" },
+          { "name": "offset", "in": "query", "schema": { "type": "integer" }, "description": "Page offset" },
+          { "name": "q", "in": "query", "schema": { "type": "string" }, "description": "Search by name/image/deployName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "containers[] page; total, offset, limit, page, total_pages, has_more; container_limit (0 = unlimited)"
+          }
+        }
+      }
+    },
+    "/api/containers/{id}": {
+      "get": {
+        "summary": "Container details",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "description": "Container ID or name" },
+          { "name": "stats", "in": "query", "schema": { "type": "string" }, "description": "If 1 — include stats (memory, CPU)" }
+        ],
+        "responses": { "200": { "description": "Container data (optional stats)" }, "404": { "description": "Not found" } }
+      },
+      "delete": {
+        "summary": "Stop and delete container (async)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "removeData", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Also delete host data under DEPLOY_BASE_PATH" }
+        ],
+        "responses": {
+          "202": { "description": "Operation accepted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AcceptedOperation" } } } },
+          "200": { "description": "Sync mode (DEPLOYER_SYNC_LEGACY=1)" },
+          "404": { "description": "Container not found" },
+          "409": { "description": "operation_in_progress" },
+          "503": { "description": "queue_full" },
+          "429": { "description": "Rate limit" }
+        }
+      }
+    },
+    "/api/containers/{id}/stats": {
+      "get": {
+        "summary": "Container stats (state, memory, CPU)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "state, memory_usage_mb, memory_limit_mb, cpu_percent (when running)" }, "404": { "description": "Not found" } }
+      }
+    },
+    "/api/containers/{id}/disk": {
+      "get": {
+        "summary": "Container disk usage",
+        "description": "Mounted dir sizes (du in container) + writable layer. Limit: 60 req/min per IP.",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "state, data_bytes, writable_bytes, total_bytes, total_mb" },
+          "404": { "description": "Container not found" },
+          "429": { "description": "Too many requests" }
+        }
+      }
+    },
+    "/api/containers/{id}/logs": {
+      "get": {
+        "summary": "Container logs (docker logs)",
+        "description": "Last stdout/stderr lines. Limit 60/min. tail 1–5000, default 500.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "tail", "in": "query", "schema": { "type": "integer", "default": 500, "minimum": 1, "maximum": 5000 } },
+          { "name": "timestamps", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Docker timestamp prefix (--timestamps)" }
+        ],
+        "responses": {
+          "200": { "description": "id, name, state, tail, logs" },
+          "404": { "description": "Container not found" },
+          "429": { "description": "Too many requests" }
+        }
+      }
+    },
+    "/api/containers/{id}/restart": {
+      "post": {
+        "summary": "Restart container (async)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "202": { "description": "Operation accepted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AcceptedOperation" } } } },
+          "200": { "description": "Sync mode (DEPLOYER_SYNC_LEGACY=1)" },
+          "404": { "description": "Not found" },
+          "409": { "description": "operation_in_progress" },
+          "503": { "description": "queue_full" },
+          "429": { "description": "Rate limit" }
+        }
+      }
+    },
+    "/api/containers/{id}/stop": {
+      "post": {
+        "summary": "Stop container (async)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "202": { "description": "Operation accepted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AcceptedOperation" } } } },
+          "200": { "description": "Sync mode (DEPLOYER_SYNC_LEGACY=1)" },
+          "404": { "description": "Not found" },
+          "409": { "description": "operation_in_progress" },
+          "503": { "description": "queue_full" },
+          "429": { "description": "Rate limit" }
+        }
+      }
+    },
+    "/api/containers/{id}/start": {
+      "post": {
+        "summary": "Start container (async)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "202": { "description": "Operation accepted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AcceptedOperation" } } } },
+          "200": { "description": "Sync mode (DEPLOYER_SYNC_LEGACY=1)" },
+          "404": { "description": "Not found" },
+          "409": { "description": "operation_in_progress" },
+          "503": { "description": "queue_full" },
+          "429": { "description": "Rate limit" }
+        }
+      }
+    }
+  }
+}

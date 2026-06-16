@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="deployer-page-title" content="page_title_editor">
+  <title>Deployer</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/theme-toggles@4.10.1/css/expand.min.css" crossorigin="anonymous">
+  <script>
+    (function(){var t=localStorage.getItem('deployer-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('deployer-lang');if(l==='en'||l==='ru')document.documentElement.setAttribute('lang',l);})();
+  </script>
+</head>
+<body>
+  <header class="header header-editor">
+    <div class="header-editor-spacer"></div>
+    <span class="header-title header-title--center" id="editor-title" data-i18n="editor_new">Новый шаблон</span>
+    <div class="header-right header-actions top-nav">
+      <button type="button" class="theme-toggle header-theme-toggle" id="theme-toggle" data-i18n-aria-label="theme_dark_aria" data-i18n-title="theme_dark_title">
+        <span class="theme-toggle-sr" data-i18n="theme_toggle_sr">Переключить тему</span>
+        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="1.875em" height="1.875em" fill="currentColor" class="theme-toggle__expand" viewBox="0 0 32 32">
+          <clipPath id="theme-toggle__expand__cutout"><path d="M0-11h25a1 1 0 0017 13v30H0Z"/></clipPath>
+          <g clip-path="url(#theme-toggle__expand__cutout)"><circle cx="16" cy="16" r="8.4"/><path d="M18.3 3.2c0 1.3-1 2.3-2.3 2.3s-2.3-1-2.3-2.3S14.7.9 16 .9s2.3 1 2.3 2.3zm-4.6 25.6c0-1.3 1-2.3 2.3-2.3s2.3 1 2.3 2.3-1 2.3-2.3 2.3-2.3-1-2.3-2.3zm15.1-10.5c-1.3 0-2.3-1-2.3-2.3s1-2.3 2.3-2.3 2.3 1 2.3 2.3-1 2.3-2.3 2.3zM3.2 13.7c1.3 0 2.3 1 2.3 2.3s-1 2.3-2.3 2.3S.9 17.3.9 16s1-2.3 2.3-2.3zm5.8-7C9 7.9 7.9 9 6.7 9S4.4 8 4.4 6.7s1-2.3 2.3-2.3S9 5.4 9 6.7zm16.3 21c-1.3 0-2.3-1-2.3-2.3s1-2.3 2.3-2.3 2.3 1 2.3 2.3-1 2.3-2.3 2.3zm2.4-21c0 1.3-1 2.3-2.3 2.3S23 7.9 23 6.7s1-2.3 2.3-2.3 2.4 1 2.4 2.3zM6.7 23C8 23 9 24 9 25.3s-1 2.3-2.3 2.3-2.3-1-2.3-2.3 1-2.3 2.3-2.3z"/></g>
+        </svg>
+      </button>
+      <a href="/index.html" class="btn btn-outline btn-touch nav-pill-btn btn-back" data-i18n="action_back">← Назад</a>
+      <div class="header-quick-actions">
+        <button type="button" class="icon-square-btn lang-toggle-btn" data-action="language-toggle" data-i18n-aria-label="lang_toggle" data-i18n-title="lang_toggle"><span data-lang-toggle-label>RU</span></button>
+      </div>
+    </div>
+  </header>
+  <main class="main editor-main">
+    <form id="template-form" class="form form-template">
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_import_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_import"></span>
+        </button>
+        <h2 data-i18n="editor_section_import">Импорт</h2>
+        <label class="import-json-label">
+          <span data-i18n="editor_import_file">Файл шаблона (.json)</span>
+          <input type="file" id="import-json" accept=".json,application/json">
+        </label>
+        <p id="import-status" class="muted" hidden></p>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_basic_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_basic"></span>
+        </button>
+        <h2 data-i18n="editor_section_basic">Основное</h2>
+        <label><span data-i18n="editor_id">ID шаблона *</span><input type="text" name="id" required pattern="[a-zA-Z0-9_-]+" placeholder="myapp"></label>
+        <label><span data-i18n="editor_name">Название *</span><input type="text" name="name" required placeholder="My App"></label>
+        <label><span data-i18n="editor_description">Описание</span><textarea name="description" class="textarea-autosize" rows="1" data-i18n-placeholder="ph_description" placeholder="Краткое описание"></textarea></label>
+        <label><span data-i18n="editor_image">Образ Docker *</span><input type="text" name="image" required placeholder="registry.example.com/myapp:latest"></label>
+        <label><span data-i18n="editor_platform">Platform</span><input type="text" name="platform" placeholder="linux/amd64"></label>
+        <label><span data-i18n="editor_user">User</span><input type="text" name="user" data-i18n-placeholder="ph_user" placeholder="1000:1000 или nobody"></label>
+        <label><span data-i18n="editor_pull_policy">Pull policy</span>
+          <select name="pullPolicy">
+            <option value="always" data-i18n-option="editor_pull_always">always — всегда скачивать образ</option>
+            <option value="ifNotPresent" data-i18n-option="editor_pull_ifnotpresent">ifNotPresent — только если образа нет локально</option>
+          </select>
+        </label>
+        <label><span data-i18n="editor_restart_policy">Restart policy</span>
+          <select name="restartPolicy">
+            <option value="unless-stopped" data-i18n-option="editor_restart_unless_stopped">unless-stopped — перезапуск, пока не остановлен вручную</option>
+            <option value="always" data-i18n-option="editor_restart_always">always — всегда перезапускать</option>
+            <option value="on-failure" data-i18n-option="editor_restart_on_failure">on-failure — только при ошибке (ненулевой exit)</option>
+            <option value="no" data-i18n-option="editor_restart_no">no — не перезапускать</option>
+          </select>
+        </label>
+        <label id="restart-retries-wrap"><span data-i18n="editor_max_retries">Max retries</span><input type="text" name="restartMaxRetries" placeholder="3" inputmode="numeric"></label>
+        <label class="inline deploy-wait"><input type="checkbox" name="waitHealthy"> <span data-i18n="editor_wait_healthy">Ждать healthy</span></label>
+        <label id="wait-timeout-wrap"><span data-i18n="editor_wait_timeout">Таймаут ожидания (с)</span><input type="text" name="waitHealthyTimeoutSec" placeholder="120" inputmode="numeric"></label>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_fields_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_fields"></span>
+        </button>
+        <h2 data-i18n="editor_section_fields">Поля формы</h2>
+        <div id="fields-list" class="repeat-list repeat-list-fields"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-field" data-i18n="editor_add_field">+ Добавить поле</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_limits_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_limits"></span>
+        </button>
+        <h2 data-i18n="editor_section_limits">Лимиты</h2>
+        <div class="limits-grid">
+          <label><span data-i18n="editor_memory">Memory</span><input type="text" name="limitMemory" placeholder="512m"></label>
+          <label><span data-i18n="editor_memory_swap">Memory swap</span><input type="text" name="limitMemorySwap" placeholder="1g"></label>
+          <label><span data-i18n="editor_cpus">CPUs</span><input type="text" name="limitCpus" placeholder="1"></label>
+          <label><span data-i18n="editor_pids">PIDs</span><input type="text" name="limitPids" placeholder="100"></label>
+        </div>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_networks_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_networks"></span>
+        </button>
+        <h2 data-i18n="editor_section_networks">Сети Docker</h2>
+        <div id="networks-list" class="repeat-list repeat-list-networks"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-network" data-i18n="editor_add_network">+ Добавить сеть</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_ports_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_ports"></span>
+        </button>
+        <h2 data-i18n="editor_section_ports">Порты</h2>
+        <div id="ports-list" class="repeat-list repeat-list-ports"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-port" data-i18n="editor_add_port">+ Добавить порт</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_env_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_env"></span>
+        </button>
+        <h2 data-i18n="editor_section_env">Переменные окружения</h2>
+        <div id="env-list" class="repeat-list"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-env" data-i18n="editor_add_env">+ Добавить переменную</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_volumes_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_volumes"></span>
+        </button>
+        <h2 data-i18n="editor_section_volumes">Тома</h2>
+        <div id="volumes-list" class="repeat-list repeat-list-volumes"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-volume" data-i18n="editor_add_volume">+ Добавить том</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_labels_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_labels"></span>
+        </button>
+        <h2 data-i18n="editor_section_labels">Метки</h2>
+        <div id="labels-list" class="repeat-list"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-label" data-i18n="editor_add_label">+ Добавить метку</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_entrypoint_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_entrypoint"></span>
+        </button>
+        <h2 data-i18n="editor_section_entrypoint">Entrypoint</h2>
+        <div id="entrypoint-list" class="repeat-list"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-entrypoint" data-i18n="editor_add_entrypoint">+ Добавить аргумент</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_command_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_command"></span>
+        </button>
+        <h2 data-i18n="editor_section_command">Command</h2>
+        <div id="command-list" class="repeat-list"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-command" data-i18n="editor_add_command">+ Добавить аргумент</button>
+      </section>
+
+      <section class="editor-section">
+        <button type="button" class="hint" data-i18n-aria-label="hint_docker_params_aria">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="6.35" r="1.05" fill="currentColor" stroke="none"/>
+            <path d="M10 9.25v5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="hint-tooltip" data-i18n-html="hint_docker_params"></span>
+        </button>
+        <h2 data-i18n="editor_section_docker_params">Параметры</h2>
+        <div id="docker-params-list" class="repeat-list repeat-list-docker"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-docker-param" data-i18n="editor_add_docker_param">+ Добавить параметр</button>
+      </section>
+
+      <details class="editor-section editor-section-collapsible">
+        <summary class="editor-collapse-summary">
+          <span class="editor-collapse-chevron" aria-hidden="true"></span>
+          <span class="editor-collapse-title" data-i18n="editor_substitutions">Подстановки</span>
+        </summary>
+        <div class="editor-collapse-body">
+          <p data-i18n-html="subst_key"></p>
+          <p data-i18n-html="subst_gen_uuid"></p>
+          <p data-i18n-html="subst_deploy_base"></p>
+          <p class="muted" data-i18n="subst_note">Подстановки можно вкладывать в «По умолчанию» полей формы и комбинировать с обычным текстом.</p>
+        </div>
+      </details>
+
+      <p id="form-error" class="error" hidden></p>
+      <div class="form-actions">
+        <a href="/index.html" class="btn btn-outline" data-i18n="action_cancel">Отмена</a>
+        <button type="submit" class="btn btn-primary" data-i18n="editor_save">Сохранить шаблон</button>
+      </div>
+    </form>
+  </main>
+  <script src="version.js"></script>
+  <script src="i18n.js"></script>
+  <script src="shell.js"></script>
+  <script src="theme.js"></script>
+  <script src="api.js"></script>
+  <script src="template-editor.js"></script>
+</body>
+</html>

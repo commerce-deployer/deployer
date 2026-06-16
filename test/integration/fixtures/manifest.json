@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "description": "Deployer-only docker integration fixtures (без Commerce store/offer контракта).",
+  "templates": {
+    "integration-smoke": {
+      "file": "integration-smoke.json",
+      "containerName": "int-smoke-{{suffix}}",
+      "deployParams": {
+        "HOST_PORT": "{{hostPort}}"
+      },
+      "expectedContainerName": "int-smoke-{{suffix}}"
+    },
+    "docker-demo-free": {
+      "file": "docker-demo-free.json",
+      "containerName": "commerce-int-{{suffix}}",
+      "deployParams": {
+        "HOST_PORT": "{{hostPort}}"
+      },
+      "expectedContainerName": "commerce-int-{{suffix}}"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="deployer-page-title" content="page_title_login">
+  <title>Deployer</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/theme-toggles@4.10.1/css/expand.min.css" crossorigin="anonymous">
+  <script>
+    (function(){var t=localStorage.getItem('deployer-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('deployer-lang');if(l==='en'||l==='ru')document.documentElement.setAttribute('lang',l);})();
+  </script>
+</head>
+<body class="page-login">
+  <div class="login-chrome header-quick-actions" role="toolbar" data-i18n-aria-label="chrome_toolbar">
+    <button type="button" class="theme-toggle header-theme-toggle" id="theme-toggle" data-i18n-aria-label="theme_dark_aria" data-i18n-title="theme_dark_title">
+      <span class="theme-toggle-sr" data-i18n="theme_toggle_sr">Переключить тему</span>
+      <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="1.875em" height="1.875em" fill="currentColor" class="theme-toggle__expand" viewBox="0 0 32 32">
+        <clipPath id="theme-toggle__expand__cutout-login"><path d="M0-11h25a1 1 0 0017 13v30H0Z"/></clipPath>
+        <g clip-path="url(#theme-toggle__expand__cutout-login)"><circle cx="16" cy="16" r="8.4"/><path d="M18.3 3.2c0 1.3-1 2.3-2.3 2.3s-2.3-1-2.3-2.3S14.7.9 16 .9s2.3 1 2.3 2.3zm-4.6 25.6c0-1.3 1-2.3 2.3-2.3s2.3 1 2.3 2.3-1 2.3-2.3 2.3-2.3-1-2.3-2.3zm15.1-10.5c-1.3 0-2.3-1-2.3-2.3s1-2.3 2.3-2.3 2.3 1 2.3 2.3-1 2.3-2.3 2.3zM3.2 13.7c1.3 0 2.3 1 2.3 2.3s-1 2.3-2.3 2.3S.9 17.3.9 16s1-2.3 2.3-2.3zm5.8-7C9 7.9 7.9 9 6.7 9S4.4 8 4.4 6.7s1-2.3 2.3-2.3S9 5.4 9 6.7zm16.3 21c-1.3 0-2.3-1-2.3-2.3s1-2.3 2.3-2.3 2.3 1 2.3 2.3-1 2.3-2.3 2.3zm2.4-21c0 1.3-1 2.3-2.3 2.3S23 7.9 23 6.7s1-2.3 2.3-2.3 2.4 1 2.4 2.3zM6.7 23C8 23 9 24 9 25.3s-1 2.3-2.3 2.3-2.3-1-2.3-2.3 1-2.3 2.3-2.3z"/></g>
+      </svg>
+    </button>
+    <button type="button" class="icon-square-btn lang-toggle-btn" data-action="language-toggle" data-i18n-aria-label="lang_toggle" data-i18n-title="lang_toggle"><span data-lang-toggle-label>RU</span></button>
+  </div>
+  <main class="login-box">
+    <div class="login-brand">
+      <img src="/logo.svg" alt="" class="login-logo" width="40" height="40">
+      <span class="login-title"><span data-i18n="brand_deployer">Deployer</span> <span class="product-version" data-i18n-aria-label="version_aria"></span></span>
+    </div>
+    <form id="login-form" class="form">
+      <label>
+        <span data-i18n="login_username">Логин</span>
+        <input type="text" name="username" autocomplete="username" required>
+      </label>
+      <label>
+        <span data-i18n="login_password">Пароль</span>
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <p id="login-error" class="error" hidden></p>
+      <button type="submit" class="btn btn-primary" data-i18n="login_submit">Войти</button>
+    </form>
+  </main>
+  <script src="version.js"></script>
+  <script src="i18n.js"></script>
+  <script src="shell.js"></script>
+  <script src="theme.js"></script>
+  <script src="api.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{
+  "id": "mariadb",
+  "name": "MariaDB",
+  "description": "MariaDB 11. Container name at deploy. Data: DEPLOY_BASE_PATH/instances/{{CONTAINER_NAME}}/data.",
+  "image": "mariadb:11",
+  "pullPolicy": "ifNotPresent",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "required": true,
+      "default": "3306"
+    },
+    {
+      "key": "MARIADB_USER",
+      "label": "Database user",
+      "required": true,
+      "default": "wordpress"
+    },
+    {
+      "key": "MARIADB_PASSWORD",
+      "label": "Database user password",
+      "type": "password",
+      "required": true
+    },
+    {
+      "key": "MARIADB_DATABASE",
+      "label": "Database name",
+      "required": true,
+      "default": "wordpress"
+    },
+    {
+      "key": "MARIADB_ROOT_PASSWORD",
+      "label": "MariaDB root password",
+      "type": "password",
+      "required": true
+    }
+  ],
+  "env": [
+    { "name": "MARIADB_USER", "value": "{{MARIADB_USER}}" },
+    { "name": "MARIADB_PASSWORD", "value": "{{MARIADB_PASSWORD}}" },
+    { "name": "MARIADB_DATABASE", "value": "{{MARIADB_DATABASE}}" },
+    { "name": "MARIADB_ROOT_PASSWORD", "value": "{{MARIADB_ROOT_PASSWORD}}" }
+  ],
+  "volumes": [
+    { "host": "{{DEPLOY_BASE_PATH}}/instances/{{CONTAINER_NAME}}/data", "container": "/var/lib/mysql" }
+  ],
+  "labels": [],
+  "networks": [],
+  "ports": [
+    { "containerPort": 3306, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "integration-smoke",
+  "name": "Integration smoke (nginx)",
+  "description": "Light nginx:alpine template for Deployer integration tests. Container name is set at deploy time.",
+  "image": "nginx:alpine",
+  "pullPolicy": "ifNotPresent",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "default": "18080"
+    }
+  ],
+  "env": [
+    { "name": "INTEGRATION_SMOKE", "value": "1" }
+  ],
+  "labels": [
+    "integration.smoke=true"
+  ],
+  "volumes": [],
+  "networks": [],
+  "ports": [
+    { "containerPort": 80, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

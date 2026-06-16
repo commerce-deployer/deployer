@@ -1,0 +1,27 @@
+services:
+  deployer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: deployer:latest
+    container_name: deployer
+    user: root
+    ports:
+      - "3000:3000"
+    environment:
+      - DEPLOY_BASE_PATH=${DEPLOY_BASE_PATH:-/opt/deploy-data}
+      - API_KEY=${API_KEY:-change-me}
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-change-me}
+      - SESSION_SECRET=${SESSION_SECRET:-change-me-session-secret}
+      - PORT=${PORT:-3000}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app
+    restart: unless-stopped
+
+networks:
+  app:
+    driver: bridge
+

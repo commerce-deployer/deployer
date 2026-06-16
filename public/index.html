@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="deployer-page-title" content="page_title_home">
+  <title>Deployer</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="stylesheet" href="style.css?v=1.2.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/theme-toggles@4.10.1/css/expand.min.css" crossorigin="anonymous">
+  <script>
+    (function(){var t=localStorage.getItem('deployer-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('deployer-lang');if(l==='en'||l==='ru')document.documentElement.setAttribute('lang',l);})();
+  </script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-brand">
+      <img src="/logo.svg" alt="" class="header-logo" width="40" height="40">
+      <span class="header-title"><span data-i18n="brand_deployer">Deployer</span> <span class="product-version" data-i18n-aria-label="version_aria"></span></span>
+    </div>
+    <div class="header-right header-actions top-nav">
+      <button type="button" class="theme-toggle header-theme-toggle" id="theme-toggle" data-i18n-aria-label="theme_dark_aria" data-i18n-title="theme_dark_title">
+        <span class="theme-toggle-sr" data-i18n="theme_toggle_sr">Переключить тему</span>
+        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="1.875em" height="1.875em" fill="currentColor" class="theme-toggle__expand" viewBox="0 0 32 32">
+          <clipPath id="theme-toggle__expand__cutout"><path d="M0-11h25a1 1 0 0017 13v30H0Z"/></clipPath>
+          <g clip-path="url(#theme-toggle__expand__cutout)"><circle cx="16" cy="16" r="8.4"/><path d="M18.3 3.2c0 1.3-1 2.3-2.3 2.3s-2.3-1-2.3-2.3S14.7.9 16 .9s2.3 1 2.3 2.3zm-4.6 25.6c0-1.3 1-2.3 2.3-2.3s2.3 1 2.3 2.3-1 2.3-2.3 2.3-2.3-1-2.3-2.3zm15.1-10.5c-1.3 0-2.3-1-2.3-2.3s1-2.3 2.3-2.3 2.3 1 2.3 2.3-1 2.3-2.3 2.3zM3.2 13.7c1.3 0 2.3 1 2.3 2.3s-1 2.3-2.3 2.3S.9 17.3.9 16s1-2.3 2.3-2.3zm5.8-7C9 7.9 7.9 9 6.7 9S4.4 8 4.4 6.7s1-2.3 2.3-2.3S9 5.4 9 6.7zm16.3 21c-1.3 0-2.3-1-2.3-2.3s1-2.3 2.3-2.3 2.3 1 2.3 2.3-1 2.3-2.3 2.3zm2.4-21c0 1.3-1 2.3-2.3 2.3S23 7.9 23 6.7s1-2.3 2.3-2.3 2.4 1 2.4 2.3zM6.7 23C8 23 9 24 9 25.3s-1 2.3-2.3 2.3-2.3-1-2.3-2.3 1-2.3 2.3-2.3z"/></g>
+        </svg>
+      </button>
+      <a href="/login.html" class="btn btn-outline btn-touch nav-pill-btn btn-logout" id="btn-logout" data-i18n="action_logout">Выход</a>
+      <div class="header-quick-actions">
+        <button type="button" class="icon-square-btn lang-toggle-btn" data-action="language-toggle" data-i18n-aria-label="lang_toggle" data-i18n-title="lang_toggle"><span data-lang-toggle-label>RU</span></button>
+      </div>
+    </div>
+  </header>
+  <main class="main">
+    <section class="section">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <h2 style="margin:0;" data-i18n="templates_heading">Шаблоны</h2>
+        <a href="/template-editor.html" class="btn btn-primary" data-i18n="templates_create">Создать шаблон</a>
+      </div>
+      <div id="templates-list" class="templates-list"></div>
+    </section>
+    <section class="section section-containers" id="section-containers">
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+        <h2 style="margin:0;" data-i18n="containers_heading">Контейнеры</h2>
+        <span id="containers-usage" class="containers-usage muted"></span>
+      </div>
+      <div class="containers-search-wrap" id="containers-search-wrap" hidden>
+        <input type="search" id="containers-search" class="containers-search-input" autocomplete="off" spellcheck="false" data-i18n-placeholder="containers_search_placeholder" data-i18n-aria-label="containers_search_placeholder">
+      </div>
+      <div id="containers-list" class="containers-list"></div>
+      <nav id="containers-pager" class="audit-pager containers-pager" aria-label="" data-i18n-aria-label="containers_pager_aria" hidden></nav>
+    </section>
+  </main>
+  <div id="modal-overlay" class="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title" data-i18n="modal_settings">Настройки</h3>
+        <button type="button" class="modal-close" id="modal-close" data-i18n-aria-label="action_close">&times;</button>
+      </div>
+      <form id="deploy-form" class="form modal-form" autocomplete="off">
+        <div id="modal-fields"></div>
+        <p id="deploy-status" class="muted modal-status" hidden></p>
+        <p id="deploy-error" class="error" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="modal-cancel" data-i18n="action_cancel">Отмена</button>
+          <button type="submit" class="btn btn-primary" data-i18n="deploy_submit">Запустить контейнер</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="container-info-modal-overlay" class="modal-overlay" hidden>
+    <div class="modal modal-logs modal-container-info">
+      <div class="modal-header">
+        <h3 id="container-info-modal-title" data-i18n="container_info_title">Контейнер</h3>
+        <button type="button" class="modal-close" id="container-info-modal-close" data-i18n-aria-label="action_close">&times;</button>
+      </div>
+      <div class="modal-container-info-tabs" role="tablist">
+        <button type="button" class="container-info-tab is-active" role="tab" id="container-info-tab-logs" data-tab="logs" aria-selected="true" data-i18n="container_info_tab_logs">Логи</button>
+        <button type="button" class="container-info-tab" role="tab" id="container-info-tab-inspect" data-tab="inspect" aria-selected="false" data-i18n="container_info_tab_inspect">Inspect</button>
+      </div>
+      <div class="modal-logs-body">
+        <p id="container-info-status" class="muted modal-status" hidden></p>
+        <p id="container-info-error" class="error" hidden></p>
+        <div id="container-info-panel-logs" class="container-info-panel" role="tabpanel">
+          <pre id="container-info-logs" class="logs-pre"></pre>
+        </div>
+        <div id="container-info-panel-inspect" class="container-info-panel" role="tabpanel" hidden>
+          <pre id="container-info-inspect" class="logs-pre logs-pre-json"></pre>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" id="container-info-refresh" data-i18n="container_info_refresh">Обновить</button>
+        <button type="button" class="btn btn-outline" id="container-info-cancel" data-i18n="action_close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+  <div id="delete-modal-overlay" class="modal-overlay modal-overlay-delete" hidden>
+    <div class="modal modal-delete">
+      <div class="modal-header">
+        <h3 data-i18n="delete_modal_title">Удалить контейнер</h3>
+        <button type="button" class="modal-close" id="delete-modal-close" data-i18n-aria-label="action_close">&times;</button>
+      </div>
+      <div class="modal-form">
+        <p class="modal-delete-intro muted"></p>
+        <ul class="modal-delete-list muted">
+          <li data-i18n="delete_modal_li_container">Только контейнер — тома с данными на сервере остаются, при следующем развёртывании можно переиспользовать каталоги.</li>
+          <li data-i18n="delete_modal_li_data">Контейнер и данные — дополнительно удаляются примонтированные каталоги под DEPLOY_BASE_PATH для этого контейнера (безвозвратно).</li>
+        </ul>
+        <p id="delete-modal-status" class="muted modal-status" hidden></p>
+        <div class="modal-actions modal-delete-actions">
+          <button type="button" class="btn btn-outline" id="delete-modal-cancel" data-i18n="action_cancel">Отмена</button>
+          <button type="button" class="btn btn-outline" id="delete-modal-container-only" data-i18n="delete_container_only">Только контейнер</button>
+          <button type="button" class="btn btn-danger" id="delete-modal-with-data" data-i18n="delete_container_with_data">Контейнер и данные</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="version.js"></script>
+  <script src="i18n.js"></script>
+  <script src="shell.js"></script>
+  <script src="theme.js"></script>
+  <script src="api.js"></script>
+  <script src="operationPoll.js"></script>
+  <script src="list-pager.js"></script>
+  <script src="app.js?v=1.2.0"></script>
+</body>
+</html>

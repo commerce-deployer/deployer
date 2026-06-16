@@ -1,0 +1,28 @@
+{
+  "id": "docker-demo-basic",
+  "name": "Docker Demo — Basic",
+  "description": "Demo docker/getting-started, basic tier. Container name at deploy. Same demo-data volume as free/pro — plan changes keep data.",
+  "image": "docker/getting-started",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "required": true,
+      "default": "8082"
+    }
+  ],
+  "env": [
+    { "name": "DEMO_PLAN", "value": "basic" },
+    { "name": "DEMO_MAX_USERS", "value": "10" }
+  ],
+  "labels": [
+    { "name": "demo.plan", "value": "basic" }
+  ],
+  "volumes": [
+    { "host": "{{DEPLOY_BASE_PATH}}/instances/{{CONTAINER_NAME}}/demo-data", "container": "/tmp/demo-data" }
+  ],
+  "networks": [],
+  "ports": [
+    { "containerPort": 80, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

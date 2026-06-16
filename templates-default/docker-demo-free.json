@@ -1,0 +1,28 @@
+{
+  "id": "docker-demo-free",
+  "name": "Docker Demo — Free",
+  "description": "Demo docker/getting-started, free tier. Container name at deploy. Shared demo-data volume across tiers for plan changes.",
+  "image": "docker/getting-started",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "required": true,
+      "default": "8081"
+    }
+  ],
+  "env": [
+    { "name": "DEMO_PLAN", "value": "free" },
+    { "name": "DEMO_MAX_USERS", "value": "1" }
+  ],
+  "labels": [
+    { "name": "demo.plan", "value": "free" }
+  ],
+  "volumes": [
+    { "host": "{{DEPLOY_BASE_PATH}}/instances/{{CONTAINER_NAME}}/demo-data", "container": "/tmp/demo-data" }
+  ],
+  "networks": [],
+  "ports": [
+    { "containerPort": 80, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

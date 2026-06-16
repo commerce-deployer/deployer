@@ -1,0 +1,21 @@
+{
+  "id": "docker-getting-started",
+  "name": "Docker Getting Started (smoke)",
+  "description": "Smoke test: docker/getting-started. Container name is set at deploy time.",
+  "image": "docker/getting-started",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "required": true,
+      "default": "8081"
+    }
+  ],
+  "env": [],
+  "labels": [],
+  "volumes": [],
+  "networks": [],
+  "ports": [
+    { "containerPort": 80, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

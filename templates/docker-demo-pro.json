@@ -1,0 +1,28 @@
+{
+  "id": "docker-demo-pro",
+  "name": "Docker Demo — Pro",
+  "description": "Demo docker/getting-started, pro tier. Container name at deploy. Same demo-data volume as free/basic — plan changes keep data.",
+  "image": "docker/getting-started",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "required": true,
+      "default": "8083"
+    }
+  ],
+  "env": [
+    { "name": "DEMO_PLAN", "value": "pro" },
+    { "name": "DEMO_MAX_USERS", "value": "100" }
+  ],
+  "labels": [
+    { "name": "demo.plan", "value": "pro" }
+  ],
+  "volumes": [
+    { "host": "{{DEPLOY_BASE_PATH}}/instances/{{CONTAINER_NAME}}/demo-data", "container": "/tmp/demo-data" }
+  ],
+  "networks": [],
+  "ports": [
+    { "containerPort": 80, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

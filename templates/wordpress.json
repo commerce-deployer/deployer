@@ -1,0 +1,53 @@
+{
+  "id": "wordpress",
+  "name": "WordPress",
+  "description": "WordPress 6. DB_HOST is the MariaDB container name. Data: instances/{{CONTAINER_NAME}}/html.",
+  "image": "wordpress:6-apache",
+  "pullPolicy": "ifNotPresent",
+  "fields": [
+    {
+      "key": "HOST_PORT",
+      "label": "Host port",
+      "required": true,
+      "default": "8080"
+    },
+    {
+      "key": "DB_HOST",
+      "label": "MariaDB container name",
+      "required": true,
+      "placeholder": "mariadb-container-name"
+    },
+    {
+      "key": "MARIADB_USER",
+      "label": "Database user",
+      "required": true,
+      "default": "wordpress"
+    },
+    {
+      "key": "MARIADB_PASSWORD",
+      "label": "Database password",
+      "type": "password",
+      "required": true
+    },
+    {
+      "key": "MARIADB_DATABASE",
+      "label": "Database name",
+      "required": true,
+      "default": "wordpress"
+    }
+  ],
+  "env": [
+    { "name": "WORDPRESS_DB_HOST", "value": "{{DB_HOST}}" },
+    { "name": "WORDPRESS_DB_USER", "value": "{{MARIADB_USER}}" },
+    { "name": "WORDPRESS_DB_PASSWORD", "value": "{{MARIADB_PASSWORD}}" },
+    { "name": "WORDPRESS_DB_NAME", "value": "{{MARIADB_DATABASE}}" }
+  ],
+  "volumes": [
+    { "host": "{{DEPLOY_BASE_PATH}}/instances/{{CONTAINER_NAME}}/html", "container": "/var/www/html" }
+  ],
+  "labels": [],
+  "networks": [],
+  "ports": [
+    { "containerPort": 80, "hostPort": "{{HOST_PORT}}", "protocol": "tcp" }
+  ]
+}

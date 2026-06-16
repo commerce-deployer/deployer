@@ -1,0 +1,33 @@
+# Контекст сборки Docker: не копировать в образ лишнее (меньше размер, нет секретов из .env).
+
+.git
+.github
+
+node_modules
+npm-debug.log*
+*.log
+
+.env
+.env.*
+!.env.example
+
+# Тесты и артефакты не нужны внутри образа
+test
+test-artifacts-e2e
+test-artifacts-*
+
+# Корневые *.md (документация репозитория)
+/*.md
+
+# IDE и Cursor
+.cursor
+.cursorignore
+cursor.ignore
+.vscode
+.idea
+
+# Прочее
+.DS_Store
+Thumbs.db
+coverage
+.nyc_output
