@@ -13,7 +13,7 @@ const { getFreePort } = require('./helpers/freePort');
 const { pollOperation, applyManifestParams, applyManifestContainerName } = require('./helpers/pollOperation');
 const { seedTemplatesDir, DEFAULT_SEED_DIR } = require('./helpers/seedTemplates');
 const { restoreIntegrationZeroState } = require('./helpers/cleanupIntegration');
-const { ensureHostPathWritable } = require('./helpers/ensureWritable');
+const { writeFileInContainer, readFileInContainer } = require('./helpers/containerFile');
 const { resetForTests } = require('../../server/operations');
 
 const API_KEY = 'integration-test-api-key';
@@ -297,9 +297,9 @@ describe('deployer docker integration', { concurrency: false }, () => {
     trackContainer(containerId);
 
     const dataDir = path.join(tmpBase, 'instances', containerName, 'data');
-    ensureHostPathWritable(dataDir);
-    const markerPath = path.join(dataDir, 'persist-marker.txt');
-    fs.writeFileSync(markerPath, 'tier-change-keeps-data', 'utf8');
+    const markerContent = 'tier-change-keeps-data';
+    const containerMarker = '/var/lib/mysql/persist-marker.txt';
+    writeFileInContainer(containerId, containerMarker, markerContent);
 
     const deleteRes = await request(app)
       .delete(`/api/containers/${encodeURIComponent(containerId)}?removeData=false`)
@@ -328,9 +328,13 @@ describe('deployer docker integration', { concurrency: false }, () => {
 
     assert.strictEqual(redeployOp.status, 'succeeded');
     assert.strictEqual(redeployOp.result?.container?.name, containerName);
-    assert.ok(fs.existsSync(markerPath), 'bind mount data must survive redeploy');
-    assert.strictEqual(fs.readFileSync(markerPath, 'utf8'), 'tier-change-keeps-data');
-    trackContainer(redeployOp.result.container.id);
+    const redeployedId = redeployOp.result.container.id;
+    assert.strictEqual(readFileInContainer(redeployedId, containerMarker), markerContent);
+    const markerPath = path.join(dataDir, 'persist-marker.txt');
+    if (fs.existsSync(markerPath)) {
+      assert.strictEqual(fs.readFileSync(markerPath, 'utf8'), markerContent);
+    }
+    trackContainer(redeployedId);
   });
 
   it('docker-demo plan change (free→basic) preserves containerName and demo-data volume', async () => {
@@ -365,7 +369,6 @@ describe('deployer docker integration', { concurrency: false }, () => {
 
     const dataDir = path.join(tmpBase, 'instances', containerName, 'demo-data');
     fs.mkdirSync(dataDir, { recursive: true });
-    ensureHostPathWritable(dataDir);
     fs.writeFileSync(path.join(dataDir, 'tier.txt'), 'survives-plan-change', 'utf8');
 
     const deleteRes = await request(app)
